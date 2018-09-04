@@ -12,30 +12,32 @@
 
 (defn hello-processing
   [values]
-  (println values))
+  (println (str "task-1: " (+ 1 (reduce + values))))
+  true)
 
 (defn hello2-processing
   [values]
-  (println values))
+  (println (str "task-2: " (+ 2 (reduce + values))))
+  true)
 
 (defn hello3-processing
   [values]
-  (println values))
+  (println (str "task-3: " (+ 3 (reduce + values))))
+  true)
 
-#_(def task {:task-type "hello2"
+#_(def task {:task-type "hello3"
            :schedule 5000
-           :params [1 2]})
+           :params [1 2 3]})
 
 (def stop-value 1)
 
 (defn next-task
   [task]
-  (println (task :task-type))
   (case (task :task-type)
     "hello" (hello-processing (task :params))
-    "hello2" (hello-processing (task :params))
-    "hello3" (hello-processing (task :params)))
-  ((Thread/sleep (task :schedule))))
+    "hello2" (hello2-processing (task :params))
+    "hello3" (hello3-processing (task :params)))
+  (Thread/sleep (task :schedule)))
 
 #_(next-task task)
 
@@ -43,7 +45,6 @@
   [task-list]
   (while (< stop-value 2) (do
                            (run! (fn [task'] (next-task task')) task-list)
-                           (println stop-value)
                            (def stop-value (inc stop-value)))))
 
 (run-task task-list)
