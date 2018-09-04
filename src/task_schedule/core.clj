@@ -37,10 +37,12 @@
     "hello3" (hello-processing (task :params)))
   ((Thread/sleep (task :schedule))))
 
+#_(next-task task)
+
 (defn run-task
   [task-list]
   (while (< stop-value 2) (do
-                           (map (fn [task'] (next-task task')) task-list)
+                           (run! (fn [task'] (next-task task')) task-list)
                            (println stop-value)
                            (def stop-value (inc stop-value)))))
 
