@@ -1,5 +1,7 @@
 (ns task-schedule.core)
 
+;; Add parameters of new task
+
 (def task-list [{:task-type "task1"
                  :schedule 5000
                  :params [1]}
@@ -12,6 +14,8 @@
                 {:task-type "task4"
                  :schedule 15000
                  :params [7 8 9 10]}])
+
+;; Add execution function of new task
 
 (defn task1-processing
   "Processing of task1"
@@ -37,6 +41,8 @@
            :schedule 5000
            :params [1 2 3]})
 
+;; Add task-type to controller-function
+
 (defn new-task
   "Find and launch processing of new task"
   [task]
@@ -48,6 +54,8 @@
   (Thread/sleep (task :schedule)))
 
 #_(next-task task)
+
+;; run application
 
 (defn run
   "Main function -- run application"
