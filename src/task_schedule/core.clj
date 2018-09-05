@@ -65,10 +65,10 @@
   [task-list]
   (run! #(new-task %1) task-list))
 
-#_(while true?
-  (defn run
-    "Main function -- run application"
-    [task-list]
-    (run! (fn [task'] (new-task task')) task-list)))
+#_(defn run
+  "Main function -- run application"
+  [task-list]
+  (while true?
+    (run! #(new-task %1) task-list)))
 
 (run task-list)
