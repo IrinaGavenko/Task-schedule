@@ -37,7 +37,7 @@
   [values]
   (println (str "task-4: " (+ 4 (reduce + values)))))
 
-#_(def task {:task-type "hello3"
+(def task {:task-type "task3"
            :schedule 5000
            :params [1 2 3]})
 
@@ -46,20 +46,29 @@
 (defn new-task
   "Find and launch processing of new task"
   [task]
-  (case (task :task-type)
-    "task1" (task1-processing (task :params))
-    "task2" (task2-processing (task :params))
-    "task3" (task3-processing (task :params))
-    "task4" (task4-processing (task :params)))
-  (Thread/sleep (task :schedule)))
+  (let [task-type (:task-type task)
+        schedule (:schedule task)
+        params (:params task)]
+    (case task-type
+      "task1" (task1-processing params)
+      "task2" (task2-processing params)
+      "task3" (task3-processing params)
+      "task4" (task4-processing params))
+    (Thread/sleep schedule)))
 
-#_(next-task task)
+#_(new-task task)
 
 ;; run application
 
 (defn run
   "Main function -- run application"
   [task-list]
-  (run! (fn [task'] (new-task task')) task-list))
+  (run! #(new-task %1) task-list))
+
+#_(while true?
+  (defn run
+    "Main function -- run application"
+    [task-list]
+    (run! (fn [task'] (new-task task')) task-list)))
 
 (run task-list)
