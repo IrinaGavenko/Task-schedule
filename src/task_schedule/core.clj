@@ -1,5 +1,7 @@
 (ns task-schedule.core)
 
+(require '[clojure.string :as str])
+
 ;; Add parameters of new task
 
 (def task-list [{:task-type "task1"
@@ -69,8 +71,11 @@
              :params params})
   (add-task task))
 
-;; Максимально упрощенная версия
-(defn check-time
+(defn curr-time
+  []
+  (str/split (.toString (java.util.Date.)) #" "))
+
+#_(defn check-time
   "Necessity to run a task"
   [schedule]
   (if (<= schedule curr-time)
@@ -85,10 +90,10 @@
 
 ;; run application
 
-(defn run
+#_(defn run
   [task-list]
   (def task-list' [])
   (run! next-task task-list)
   (recur task-list'))
 
-(run task-list)
+#_(run task-list)
