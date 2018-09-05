@@ -1,7 +1,4 @@
 (ns task-schedule.core-test
   (:require [clojure.test :refer :all]
-            [task-schedule.core :refer :all]))
+            [task-schedule.core :as core]))
 
-(deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 0 1))))
