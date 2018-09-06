@@ -1,11 +1,10 @@
 (ns task-schedule.core
-  (:require [clojure.string :as cstr])
+  (:require [clojure.string :as cstr]
+            [clj-time.core :as t]
+            [clj-time.periodic :as p]
+            [clj-time.local :as l])
   (:require [task-schedule.jobs :refer [task-list]]
             [task-schedule.config :refer [conf]]))
-
-;; Add parameters of new task
-
-;; Add execution function of new task
 
 (defn task1-processing
   "Processing of task1"
@@ -27,82 +26,57 @@
   [values]
   (println (str "task-4: " (+ 4 (reduce + values)))))
 
-
+;;_____________________________________________________________
 (def test-task {:task-type "task3"
-           :schedule 5000
-           :params [1 2 3]})
+                :schedule 5
+                :run-at (t/now)
+                :params [1 2 3]})
 
+(defn add-time
+  [schedule run-at]
+  (nth (p/periodic-seq
+            run-at
+            (t/hours schedule)) 1))
+
+(defn update-task
+  [{:keys [task-type schedule run-at params]}]
+     {:task-type task-type
+     :schedule schedule
+     :run-at (add-time schedule run-at)
+     :params params})
+
+#_(println (update-task test-task))
 
 (defn launch-task
   "Find and launch processing of new task"
-  [{:keys [task-type schedule params] :as task}]
+  [{:keys [task-type schedule run-at params] :as task}]
   (case task-type
     "task1" (task1-processing params)
     "task2" (task2-processing params)
     "task3" (task3-processing params)
     "task4" (task4-processing params))
-  (update task :schedule inc))
+  (update-task task))
 
-(launch-task test-task)
-
-
-;; Костыльный способ конвертации в нужный формат
-#_(defn convert-week
-  [week]
-  (case week
-    "Mon" 1
-    "Tue" 2
-    "Wen" 3
-    "Thu" 4
-    "Fri" 5
-    "Sut" 6
-    "Sun" 7))
-
-#_(defn convert-month
-  [month]
-  (case month
-    "Jan" 1
-    "Feb" 2
-    "Mar" 3
-    "Apr" 4
-    "May" 5
-    "Jun" 6
-    "Jul" 7
-    "Aug" 8
-    "Sep" 9
-    "Oct" 10
-    "Nov" 11
-    "Dec" 12))
-
-#_(defn curr-time
-  []
-  (let [[week month date time city year]
-        (cstr/split (.toString (java.util.Date.)) #" ")]
-    (let [[hours mins secs] (cstr/split time #":")]
-      {:m   (Integer/parseInt mins)
-       :h   (Integer/parseInt hours)
-       :dom (convert-week week)
-       :mon (convert-month month)
-       :dow (Integer/parseInt year)})))
-
-
-#_(curr-time)
-
-(def curr-time 13)
+#_(println (launch-task test-task))
 
 (defn check-time
   "Necessity to run a task"
-  [schedule]
-  (<= schedule (conf :curr-time)))
+  [run-at]
+  (t/before? run-at (t/now)))
+
+#_(println (check-time (test-task :run-at)))
 
 (defn next-task
   [task]
-  (if (check-time (task :schedule))
+  (if (check-time (task :run-at))
     (launch-task task)))
 
+#_(next-task test-task)
+
+;;_____________________________________________________________
 ;; run application
 
-#_(defn run
+(defn run
   [task-list]
   (Thread/sleep (config/conf :pause))
   (->>
@@ -110,4 +84,4 @@
     (doall)
     (recur)))
 
-#_(run jobs/task-list)
+(run jobs/task-list)
