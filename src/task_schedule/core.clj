@@ -1,6 +1,5 @@
-(ns task-schedule.core)
-
-(require '[clojure.string :as str])
+(ns task-schedule.core
+  (:require [clojure.string :as cstr]))
 
 ;; Add parameters of new task
 
@@ -39,7 +38,7 @@
   [values]
   (println (str "task-4: " (+ 4 (reduce + values)))))
 
-#_(def task {:task-type "task3"
+(def test-task {:task-type "task3"
            :schedule 5000
            :params [1 2 3]})
 
@@ -52,30 +51,31 @@
   (run! new-task task-list))
 
 (def curr-time 13)
-(def task-list' [])
 
-(defn add-task
-  [task]
-  (def task-list' (conj task-list' task)))
 
+;; Есть ошибка в update!!!
 (defn launch-task
   "Find and launch processing of new task"
-  [{:keys [task-type schedule params]}]
+  [{:keys [task-type schedule params] :as task}]
   (case task-type
     "task1" (task1-processing params)
     "task2" (task2-processing params)
     "task3" (task3-processing params)
     "task4" (task4-processing params))
-  (def task {:task-type task-type
-             :schedule (+ 1 schedule)
-             :params params})
-  (add-task task))
+  (update task :schedule inc))
 
-(defn curr-time
+(launch-task test-task)
+
+(defn __curr-time
   []
-  (str/split (.toString (java.util.Date.)) #" "))
+  (cstr/split (.toString (java.util.Date.)) #" "))
 
-#_(defn check-time
+(def curr-time 13)
+
+;; schedule format:
+;; m h dom mon dow
+
+(defn check-time
   "Necessity to run a task"
   [schedule]
   (if (<= schedule curr-time)
@@ -83,16 +83,14 @@
     false))
 
 (defn next-task
-  [{:keys [task-type schedule params] :as task}]
-  (if (check-time schedule)
-    (launch-task task)
-    (add-task task)))
+  [task]
+  (if (check-time (task :schedule))
+    (launch-task task)))
 
 ;; run application
 
 #_(defn run
   [task-list]
-  (def task-list' [])
   (run! next-task task-list)
   (recur task-list'))
 
