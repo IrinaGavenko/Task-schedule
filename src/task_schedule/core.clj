@@ -50,7 +50,7 @@
   [task-list]
   (run! new-task task-list))
 
-(def curr-time 13)
+#_(def curr-time 15)
 
 
 ;; Есть ошибка в update!!!
@@ -62,15 +62,55 @@
     "task2" (task2-processing params)
     "task3" (task3-processing params)
     "task4" (task4-processing params))
-  (update task :schedule inc))
+  (update task :schedule inc)
+  (println (task :schedule)))
 
 (launch-task test-task)
 
-(defn __curr-time
-  []
-  (cstr/split (.toString (java.util.Date.)) #" "))
 
-(def curr-time 13)
+;; Костыльный способ конвертации в нужный формат
+(defn convert-week
+  [week]
+  (case week
+    "Mon" 1
+    "Tue" 2
+    "Wen" 3
+    "Thu" 4
+    "Fri" 5
+    "Sut" 6
+    "Sun" 7))
+
+(defn convert-month
+  [month]
+  (case month
+    "Jan" 1
+    "Feb" 2
+    "Mar" 3
+    "Apr" 4
+    "May" 5
+    "Jun" 6
+    "Jul" 7
+    "Aug" 8
+    "Sep" 9
+    "Oct" 10
+    "Nov" 11
+    "Dec" 12))
+
+(defn curr-time
+  []
+  (let [[week month date time city year]
+        (cstr/split (.toString (java.util.Date.)) #" ")]
+    (let [[hours mins secs] (cstr/split time #":")]
+      {:m   (Integer/parseInt mins)
+       :h   (Integer/parseInt hours)
+       :dom (convert-week week)
+       :mon (convert-month month)
+       :dow (Integer/parseInt year)})))
+
+
+(curr-time)
+
+#_(def curr-time 13)
 
 ;; schedule format:
 ;; m h dom mon dow
@@ -78,9 +118,7 @@
 (defn check-time
   "Necessity to run a task"
   [schedule]
-  (if (<= schedule curr-time)
-    true
-    false))
+  (<= schedule curr-time))
 
 (defn next-task
   [task]
@@ -92,6 +130,7 @@
 #_(defn run
   [task-list]
   (run! next-task task-list)
-  (recur task-list'))
+  (Thread/sleep 5000)
+  (recur task-list))
 
 #_(run task-list)
