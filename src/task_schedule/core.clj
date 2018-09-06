@@ -1,6 +1,7 @@
 (ns task-schedule.core
   (:require [clojure.string :as cstr])
-  (:require [task-schedule.jobs :as jobs]))
+  (:require [task-schedule.jobs :as jobs]
+            [task-schedule.config :as config]))
 
 ;; Add parameters of new task
 
@@ -101,12 +102,12 @@
 
 ;; run application
 
-#_(defn run
+(defn run
   [task-list]
-  (Thread/sleep 5000)
+  (Thread/sleep config/pause)
   (->>
     (map next-task task-list)
     (doall)
     (recur)))
 
-#_(run jobs/task-list)
+(run jobs/task-list)
