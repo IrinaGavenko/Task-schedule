@@ -5,15 +5,19 @@
 
 (def task-list [{:task-type "task1"
                  :schedule 5
+                 ;; :run-at (curr-time)
                  :params [1]}
                 {:task-type "task2"
                  :schedule 10
+                 ;; :run-at (curr-time)
                  :params [2 3]}
                 {:task-type "task3"
                  :schedule 12
+                 ;;:run-at (curr-time)
                  :params [4 5 6]}
                 {:task-type "task4"
                  :schedule 15
+                 ;; :run-at (curr-time)
                  :params [7 8 9 10]}])
 
 ;; Add execution function of new task
@@ -38,22 +42,12 @@
   [values]
   (println (str "task-4: " (+ 4 (reduce + values)))))
 
+
 (def test-task {:task-type "task3"
            :schedule 5000
            :params [1 2 3]})
 
 
-#_(new-task task)
-
-#_(defn run
-  "Main function -- run application"
-  [task-list]
-  (run! new-task task-list))
-
-#_(def curr-time 15)
-
-
-;; Есть ошибка в update!!!
 (defn launch-task
   "Find and launch processing of new task"
   [{:keys [task-type schedule params] :as task}]
@@ -62,14 +56,13 @@
     "task2" (task2-processing params)
     "task3" (task3-processing params)
     "task4" (task4-processing params))
-  (update task :schedule inc)
-  (println (task :schedule)))
+  (update task :schedule inc))
 
 (launch-task test-task)
 
 
 ;; Костыльный способ конвертации в нужный формат
-(defn convert-week
+#_(defn convert-week
   [week]
   (case week
     "Mon" 1
@@ -80,7 +73,7 @@
     "Sut" 6
     "Sun" 7))
 
-(defn convert-month
+#_(defn convert-month
   [month]
   (case month
     "Jan" 1
@@ -96,7 +89,7 @@
     "Nov" 11
     "Dec" 12))
 
-(defn curr-time
+#_(defn curr-time
   []
   (let [[week month date time city year]
         (cstr/split (.toString (java.util.Date.)) #" ")]
@@ -108,12 +101,9 @@
        :dow (Integer/parseInt year)})))
 
 
-(curr-time)
+#_(curr-time)
 
-#_(def curr-time 13)
-
-;; schedule format:
-;; m h dom mon dow
+(def curr-time 13)
 
 (defn check-time
   "Necessity to run a task"
@@ -127,10 +117,12 @@
 
 ;; run application
 
-#_(defn run
+(defn run
   [task-list]
-  (run! next-task task-list)
   (Thread/sleep 5000)
-  (recur task-list))
+  (->>
+    (map next-task task-list)
+    (doall)
+    (recur)))
 
-#_(run task-list)
+(run task-list)
