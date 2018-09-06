@@ -27,18 +27,22 @@
   (println (str "task-4: " (+ 4 (reduce + values)))))
 
 ;;_____________________________________________________________
-(def test-task {:task-type "task3"
+#_(def test-task {:task-type "task3"
                 :schedule 5
                 :run-at (t/now)
                 :params [1 2 3]})
 
+;; Предполагается, что периодичность задается в часах
+;; НАДО ПОПРАВИТЬ!!!
 (defn add-time
+  "Get next time for processing"
   [schedule run-at]
   (nth (p/periodic-seq
             run-at
             (t/hours schedule)) 1))
 
 (defn update-task
+  "Add task with new processing time"
   [{:keys [task-type schedule run-at params]}]
      {:task-type task-type
      :schedule schedule
