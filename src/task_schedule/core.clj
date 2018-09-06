@@ -1,7 +1,7 @@
 (ns task-schedule.core
   (:require [clojure.string :as cstr])
-  (:require [task-schedule.jobs :as jobs]
-            [task-schedule.config :as config]))
+  (:require [task-schedule.jobs :refer [task-list]]
+            [task-schedule.config :refer [conf]]))
 
 ;; Add parameters of new task
 
@@ -93,7 +93,7 @@
 (defn check-time
   "Necessity to run a task"
   [schedule]
-  (<= schedule (config/conf :curr-time)))
+  (<= schedule (conf :curr-time)))
 
 (defn next-task
   [task]
