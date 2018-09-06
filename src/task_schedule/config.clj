@@ -1,3 +1,5 @@
 (ns task-schedule.config)
 
-(def pause 5000)
+(def conf
+  {:pause     5000
+   :curr-time 15})

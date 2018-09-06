@@ -93,7 +93,7 @@
 (defn check-time
   "Necessity to run a task"
   [schedule]
-  (<= schedule curr-time))
+  (<= schedule (config/conf :curr-time)))
 
 (defn next-task
   [task]
@@ -102,12 +102,12 @@
 
 ;; run application
 
-(defn run
+#_(defn run
   [task-list]
-  (Thread/sleep config/pause)
+  (Thread/sleep (config/conf :pause))
   (->>
     (map next-task task-list)
     (doall)
     (recur)))
 
-(run jobs/task-list)
+#_(run jobs/task-list)
