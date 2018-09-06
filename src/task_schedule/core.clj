@@ -1,24 +1,8 @@
 (ns task-schedule.core
-  (:require [clojure.string :as cstr]))
+  (:require [clojure.string :as cstr])
+  (:require [task-schedule.jobs :as jobs]))
 
 ;; Add parameters of new task
-
-(def task-list [{:task-type "task1"
-                 :schedule 5
-                 ;; :run-at (curr-time)
-                 :params [1]}
-                {:task-type "task2"
-                 :schedule 10
-                 ;; :run-at (curr-time)
-                 :params [2 3]}
-                {:task-type "task3"
-                 :schedule 12
-                 ;;:run-at (curr-time)
-                 :params [4 5 6]}
-                {:task-type "task4"
-                 :schedule 15
-                 ;; :run-at (curr-time)
-                 :params [7 8 9 10]}])
 
 ;; Add execution function of new task
 
@@ -117,7 +101,7 @@
 
 ;; run application
 
-(defn run
+#_(defn run
   [task-list]
   (Thread/sleep 5000)
   (->>
@@ -125,4 +109,4 @@
     (doall)
     (recur)))
 
-(run task-list)
+#_(run jobs/task-list)
