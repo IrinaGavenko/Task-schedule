@@ -72,19 +72,54 @@
 (defn next-task
   [task]
   (if (check-time (task :run-at))
-    (launch-task task)))
-
-#_(next-task test-task)
+    (launch-task task)
+    task))
 
 ;;_____________________________________________________________
 ;; run application
 
-#_(defn run
-  [task-list]
-  (Thread/sleep (config/conf :pause))
-  (->>
-    (map next-task task-list)
-    (doall)
-    (recur)))
+(defn start-circle
+  [processed? task-list]
+  (when @processed?
+    (Thread/sleep (:pause conf))
+    (->>
+      (map next-task task-list)
+      (doall)
+      (recur processed?))))
 
-#_(run jobs/task-list)
+#_(run (atom true) task-list)
+
+(defn run
+  [processed? jobs]
+  (future (start-circle processed? (:task-list jobs))))
+
+
+(defrecord MainComponent
+  [jobs]
+  component/Lifecycle
+
+  (start [this]
+    (let [processed? true]
+      (run processed? jobs)
+      (assoc this :processed? processed?)))
+
+  (stop [this]
+    (println this)
+    (update this :processed? #(reset! % false))
+    )
+  )
+
+#_(defn waste-time
+  [a]
+  (Thread/sleep 10000)
+  a)
+
+(->
+  (component/system-map
+   :main-component (map->MainComponent {:jobs task-list}))
+  (component/start)
+  ;;(waste-time)
+  ;;(component/stop)
+  )
+
+#_(next-task test-task)
