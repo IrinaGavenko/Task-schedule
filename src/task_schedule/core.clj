@@ -74,20 +74,6 @@
   (if (check-time (task :run-at))
     (launch-task task)))
 
-(defcomponent main-component
-              [jobs]
-              [config]
-              (start
-                [this]
-                (Thread/sleep (config :pause))
-                (->>
-                  (map next-task (jobs :task-list))
-                  (doall)
-                  (recur)))
-              (stop
-                [this]
-                true))
-
 #_(next-task test-task)
 
 ;;_____________________________________________________________
