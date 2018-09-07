@@ -4,7 +4,8 @@
             [clj-time.periodic :as p]
             [clj-time.local :as l])
   (:require [task-schedule.jobs :refer [task-list]]
-            [task-schedule.config :refer [conf]]))
+            [task-schedule.config :refer [conf]])
+  (:require [com.stuartsierra.component :as component]))
 
 (defn task1-processing
   "Processing of task1"
@@ -37,9 +38,7 @@
 (defn add-time
   "Get next time for processing"
   [schedule run-at]
-  (nth (p/periodic-seq
-            run-at
-            (t/hours schedule)) 1))
+  (t/plus run-at (t/hours schedule)))
 
 (defn update-task
   "Add task with new processing time"
@@ -75,12 +74,26 @@
   (if (check-time (task :run-at))
     (launch-task task)))
 
+(defcomponent main-component
+              [jobs]
+              [config]
+              (start
+                [this]
+                (Thread/sleep (config :pause))
+                (->>
+                  (map next-task (jobs :task-list))
+                  (doall)
+                  (recur)))
+              (stop
+                [this]
+                true))
+
 #_(next-task test-task)
 
 ;;_____________________________________________________________
 ;; run application
 
-(defn run
+#_(defn run
   [task-list]
   (Thread/sleep (config/conf :pause))
   (->>
@@ -88,4 +101,4 @@
     (doall)
     (recur)))
 
-(run jobs/task-list)
+#_(run jobs/task-list)

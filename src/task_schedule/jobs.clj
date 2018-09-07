@@ -1,5 +1,6 @@
 (ns task-schedule.jobs
-  (:require [clj-time.local :as l]))
+  (:require [clj-time.local :as l])
+  (:require [com.stuartsierra.component :as component]))
 
 (def task-list [{:task-type "task1"
                  :schedule 5
