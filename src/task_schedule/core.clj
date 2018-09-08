@@ -5,7 +5,9 @@
             [clj-time.local :as l])
   (:require [task-schedule.jobs :refer [task-list]]
             [task-schedule.config :refer [conf]])
-  (:require [com.stuartsierra.component :as component]))
+  (:require [com.stuartsierra.component :as component]
+            [defcomponent :refer [defcomponent]])
+  (:import (task_schedule.core MainComponent)))
 
 (defn task1-processing
   "Processing of task1"
@@ -93,33 +95,49 @@
   [processed? jobs]
   (future (start-circle processed? (:task-list jobs))))
 
+(defcomponent MainComponent
+              [jobs]
+              [config]
 
-(defrecord MainComponent
-  [jobs]
-  component/Lifecycle
+              (start [this]
+                     (let [processed? true]
+                       (run processed? jobs)
+                       (assoc this :processed? processed?)))
 
-  (start [this]
-    (let [processed? true]
-      (run processed? jobs)
-      (assoc this :processed? processed?)))
+              (stop [this]
+                    (println this)
+                    (update this :processed? #(reset! % false))))
 
-  (stop [this]
-    (println this)
-    (update this :processed? #(reset! % false))
-    )
-  )
+(System [MainComponent]
+        :start true
+        :file-config "config.clj"
+        :repo "jobs.clj")
 
-#_(defn waste-time
-  [a]
-  (Thread/sleep 10000)
-  a)
 
-(->
-  (component/system-map
-   :main-component (map->MainComponent {:jobs task-list}))
-  (component/start)
-  ;;(waste-time)
-  ;;(component/stop)
-  )
+(comment (defrecord MainComponent
+   [jobs]
+   component/Lifecycle
+
+   (start [this]
+     (let [processed? true]
+       (run processed? jobs)
+       (assoc this :processed? processed?)))
+
+   (stop [this]
+     (println this)
+     (update this :processed? #(reset! % false))))
+
+  #_(defn waste-time
+      [a]
+      (Thread/sleep 10000)
+      a)
+
+  (->
+    (component/system-map
+      :main-component (map->MainComponent {:jobs task-list}))
+    (component/start)
+    ;;(waste-time)
+    ;;(component/stop)
+    ))
 
 #_(next-task test-task)
